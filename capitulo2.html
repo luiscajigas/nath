@@ -6,61 +6,770 @@
   <title>Capítulo II ✿</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --pink-300: #ff8fb8;
-      --pink-400: #f76597;
-      --pink-500: #e83e75;
-      --text-dark: #4a2035;
-      --text-mid:  #7d3f5a;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      background: linear-gradient(135deg, #fff8fb 0%, #fdf0f5 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Cormorant Garamond', serif;
-      animation: fadeIn 0.8s ease;
-      gap: 2rem;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-    h1 {
-      font-family: 'Pinyon Script', cursive;
-      font-size: clamp(3rem, 8vw, 6rem);
-      font-weight: 400;
-      color: var(--text-dark);
-    }
-    p {
-      font-family: 'Dancing Script', cursive;
-      font-size: 1.3rem;
-      color: var(--text-mid);
-      opacity: 0.8;
-    }
-    .btn {
-      font-family: 'Dancing Script', cursive;
-      font-size: 1rem;
-      color: var(--pink-500);
-      background: none;
-      border: 1px solid rgba(232, 62, 117, 0.3);
-      border-radius: 50px;
-      padding: 0.6rem 1.5rem;
-      cursor: pointer;
-      transition: all 0.25s ease;
-    }
-    .btn:hover { background: rgba(232, 62, 117, 0.06); border-color: var(--pink-400); }
-    .ornament { font-family: 'Cormorant Garamond', serif; color: var(--pink-300); font-size: 1.5rem; letter-spacing: 0.5em; opacity: 0.6; }
+/* ── Reset ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+
+/* ── Fuentes ─────────────────────────────────────── */
+:root {
+  --font-script:  'Pinyon Script', cursive;
+  --font-dancing: 'Dancing Script', cursive;
+  --font-serif:   'Cormorant Garamond', serif;
+}
+
+/* ══════════════════════════════════════════════════
+   FONDO — transición día → noche
+══════════════════════════════════════════════════ */
+body {
+  background: #fde8f0;   /* rosa día, se sobrescribe con JS */
+  font-family: var(--font-serif);
+  position: relative;
+  transition: background 0s;   /* JS maneja la interpolación */
+}
+
+/* Canvas de partículas de fondo */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════
+   ESTRELLAS (solo visibles de noche)
+══════════════════════════════════════════════════ */
+.stars {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+.stars.visible { opacity: 1; }
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkle linear infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.4); }
+}
+
+/* ══════════════════════════════════════════════════
+   LAYOUT PRINCIPAL
+══════════════════════════════════════════════════ */
+.scene {
+  position: relative;
+  z-index: 3;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════════
+   PANEL IZQUIERDO  (cronómetro + carta)
+══════════════════════════════════════════════════ */
+.left-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem 2rem 3rem;
+  gap: 2.5rem;
+  position: relative;
+}
+
+/* ── Cronómetro ──────────────────────────────────── */
+.counter-wrap {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+.counter-wrap.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.counter-label {
+  font-family: var(--font-dancing);
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #e8c0d0;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  transition: color 3s ease;
+}
+
+.counter-number {
+  font-family: var(--font-script);
+  font-size: clamp(5rem, 11vw, 9rem);
+  line-height: 1;
+  color: #ffe0ed;
+  text-shadow:
+    0 0 30px rgba(255,160,200,0.6),
+    0 0 60px rgba(255,120,170,0.3),
+    0 2px 8px rgba(0,0,0,0.4);
+  transition: color 3s ease, text-shadow 3s ease;
+}
+
+.counter-sublabel {
+  font-family: var(--font-dancing);
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  font-weight: 600;
+  color: #ffb3ce;
+  margin-top: 0.35rem;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+  transition: color 3s ease;
+  letter-spacing: 0.02em;
+}
+
+/* ── Carta ───────────────────────────────────────── */
+.letter-wrap {
+  width: 100%;
+  max-width: 420px;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1.6s ease 0.4s, transform 1.6s ease 0.4s;
+}
+.letter-wrap.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.letter-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 200, 220, 0.25);
+  border-radius: 3px;
+  padding: 1.4rem 1.6rem 1.2rem 2rem;
+  backdrop-filter: blur(6px);
+  position: relative;
+  box-shadow:
+    0 4px 20px rgba(0,0,0,0.18),
+    inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+/* Líneas de papel sutiles */
+.letter-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background-image: repeating-linear-gradient(
+    to bottom, transparent, transparent 27px,
+    rgba(255,180,210,0.07) 27px, rgba(255,180,210,0.07) 28px
+  );
+  background-position: 0 54px;
+  pointer-events: none;
+}
+
+/* Margen de carta */
+.letter-card::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 38px;
+  width: 1px;
+  background: rgba(255,160,200,0.12);
+  pointer-events: none;
+}
+
+.letter-title-small {
+  font-family: var(--font-script);
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  color: #ffd0e6;
+  text-shadow: 0 0 16px rgba(255,140,190,0.5);
+  margin-bottom: 0.6rem;
+  position: relative;
+  z-index: 1;
+}
+
+.letter-body-text {
+  font-family: var(--font-dancing);
+  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  font-weight: 400;
+  line-height: 1.9;
+  color: #f0c8db;
+  white-space: pre-wrap;
+  word-break: break-word;
+  position: relative;
+  z-index: 1;
+  padding-left: 46px;
+  max-height: 22vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,160,200,0.3) transparent;
+}
+
+.letter-cursor {
+  display: inline-block;
+  font-family: var(--font-dancing);
+  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  color: #ff8fbf;
+  animation: blink 1s step-start infinite;
+  position: relative;
+  z-index: 1;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.letter-sign {
+  text-align: right;
+  font-family: var(--font-script);
+  font-size: 1.1rem;
+  color: rgba(255,192,220,0.7);
+  margin-top: 0.6rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255,160,200,0.12);
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Botón volver ────────────────────────────────── */
+.back-btn {
+  opacity: 0;
+  transition: opacity 1.5s ease 1s;
+  font-family: var(--font-dancing);
+  font-size: 0.9rem;
+  color: rgba(255,180,210,0.55);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem 0;
+  letter-spacing: 0.04em;
+}
+.back-btn.visible { opacity: 1; }
+.back-btn:hover { color: rgba(255,180,210,0.9); text-decoration: underline; }
+
+/* ══════════════════════════════════════════════════
+   ÁRBOL (panel derecho)
+══════════════════════════════════════════════════ */
+.tree-panel {
+  width: 42%;
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+#treeCanvas {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+
+/* ══════════════════════════════════════════════════
+   LUNA
+══════════════════════════════════════════════════ */
+.moon {
+  position: fixed;
+  top: 6vh;
+  right: 8vw;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 3s ease 1s;
+  pointer-events: none;
+}
+.moon.visible { opacity: 1; }
+
+.moon-circle {
+  width: clamp(50px, 7vw, 90px);
+  height: clamp(50px, 7vw, 90px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #fff8e1, #fde68a 40%, #f6c35e 80%);
+  box-shadow:
+    0 0 20px rgba(253, 230, 138, 0.7),
+    0 0 50px rgba(253, 230, 138, 0.35),
+    0 0 90px rgba(253, 230, 138, 0.15);
+  animation: moonGlow 4s ease-in-out infinite;
+}
+
+@keyframes moonGlow {
+  0%,100% { box-shadow: 0 0 20px rgba(253,230,138,.7), 0 0 50px rgba(253,230,138,.35), 0 0 90px rgba(253,230,138,.15); }
+  50%     { box-shadow: 0 0 30px rgba(253,230,138,.9), 0 0 70px rgba(253,230,138,.5),  0 0 120px rgba(253,230,138,.2); }
+}
+
+/* ══════════════════════════════════════════════════
+   ENTRADA DE PÁGINA
+══════════════════════════════════════════════════ */
+.scene {
+  animation: sceneIn 0.7s ease both;
+}
+@keyframes sceneIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
   </style>
 </head>
 <body>
-  <div class="ornament">~ ✿ ~</div>
-  <h1>Capítulo II</h1>
-  <p>Pronto, aquí vendrá algo muy especial…</p>
-  <button class="btn" onclick="history.back()">← Volver al capítulo uno</button>
-  <div class="ornament">~ ✦ ~</div>
+
+<!-- Fondo canvas partículas -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- Estrellas -->
+<div class="stars" id="stars"></div>
+
+<!-- Luna -->
+<div class="moon" id="moon">
+  <div class="moon-circle"></div>
+</div>
+
+<!-- Escena principal -->
+<div class="scene">
+
+  <!-- ── IZQUIERDA ── -->
+  <div class="left-content">
+
+    <!-- Cronómetro de días -->
+    <div class="counter-wrap" id="counterWrap">
+      <div class="counter-label" id="counterLabel">llevamos juntos</div>
+      <div class="counter-number" id="counterNumber">0</div>
+      <div class="counter-sublabel">días desde que me hice tu novio</div>
+    </div>
+
+    <!-- Carta -->
+    <div class="letter-wrap" id="letterWrap">
+      <div class="letter-card">
+        <div class="letter-title-small">Para ti…</div>
+        <div class="letter-body-text" id="letterBody"></div><span class="letter-cursor" id="letterCursor">|</span>
+        <div class="letter-sign">con todo 🤍</div>
+      </div>
+    </div>
+
+    <button class="back-btn" id="backBtn" onclick="history.back()">← volver al capítulo uno</button>
+
+  </div>
+
+  <!-- ── ÁRBOL ── -->
+  <div class="tree-panel">
+    <canvas id="treeCanvas"></canvas>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//   CONFIGURACIÓN — edita aquí
+// ══════════════════════════════════════════════════
+const START_DATE  = new Date("2024-04-11T00:00:00");
+const LETTER_TEXT = "jashdkdksfkdf laksddddddddddddddd asldkkkkkkkkkkk";
+const TYPING_SPEED = 52;   // ms por caracter
+
+// ══════════════════════════════════════════════════
+//   DÍAS TRANSCURRIDOS
+// ══════════════════════════════════════════════════
+function daysSince(date) {
+  const now  = new Date();
+  const diff = now - date;
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+// ══════════════════════════════════════════════════
+//   INTERPOLACIÓN DE COLOR (día → noche)
+// ══════════════════════════════════════════════════
+const SKY_COLORS = [
+  // t=0  día claro rosado
+  { r: 253, g: 232, b: 240 },
+  // t=0.3  atardecer durazno
+  { r: 255, g: 180, b: 130 },
+  // t=0.55 crepúsculo morado-rosa
+  { r: 120, g:  80, b: 120 },
+  // t=0.75 azul noche profunda
+  { r:  22, g:  22, b:  54 },
+  // t=1  noche oscura
+  { r:   8, g:   8, b:  28 },
+];
+
+function lerpColor(a, b, t) {
+  return {
+    r: Math.round(a.r + (b.r - a.r) * t),
+    g: Math.round(a.g + (b.g - a.g) * t),
+    b: Math.round(a.b + (b.b - a.b) * t),
+  };
+}
+
+function skyColorAt(t) {
+  // t: 0..1
+  const n   = SKY_COLORS.length - 1;
+  const idx = Math.min(Math.floor(t * n), n - 1);
+  const frac = (t * n) - idx;
+  return lerpColor(SKY_COLORS[idx], SKY_COLORS[idx + 1], frac);
+}
+
+function mulberry32(seed) {
+  return function () {
+    let t = (seed += 0x6D2B79F5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ══════════════════════════════════════════════════
+//   CANVAS DE PARTÍCULAS (hojas cayendo)
+// ══════════════════════════════════════════════════
+const bgCanvas = document.getElementById("bgCanvas");
+const bgCtx    = bgCanvas.getContext("2d");
+
+let leaves = [];
+let nightProgress = 0; // 0=día, 1=noche
+
+function resizeBg() {
+  bgCanvas.width  = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+}
+
+class Leaf {
+  constructor() { this.reset(true); }
+  reset(init = false) {
+    this.x    = Math.random() * bgCanvas.width;
+    this.y    = init ? Math.random() * bgCanvas.height : -20;
+    this.size = 4 + Math.random() * 8;
+    this.rot  = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.04;
+    this.vx   = (Math.random() - 0.5) * 0.8;
+    this.vy   = 0.4 + Math.random() * 0.7;
+    this.sway = Math.random() * Math.PI * 2;
+    this.swaySpeed = 0.01 + Math.random() * 0.02;
+    // Color según progreso noche
+    const day  = { r: 200, g: 140, b: 160 };
+    const night= { r: 100, g:  60, b:  90 };
+    const c    = lerpColor(day, night, nightProgress);
+    this.color = `rgba(${c.r},${c.g},${c.b},${0.35 + Math.random() * 0.35})`;
+  }
+  update() {
+    this.sway    += this.swaySpeed;
+    this.x       += this.vx + Math.sin(this.sway) * 0.5;
+    this.y       += this.vy;
+    this.rot     += this.rotSpeed;
+    if (this.y > bgCanvas.height + 20) this.reset();
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, this.size * 0.4, this.size, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // nervadura
+    ctx.strokeStyle = `rgba(255,255,255,0.15)`;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(0, -this.size);
+    ctx.lineTo(0,  this.size);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function initLeaves() {
+  leaves = Array.from({ length: 55 }, () => new Leaf());
+}
+
+function animateBg() {
+  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+  leaves.forEach(l => { l.update(); l.draw(bgCtx); });
+  requestAnimationFrame(animateBg);
+}
+
+// ══════════════════════════════════════════════════
+//   ESTRELLAS
+// ══════════════════════════════════════════════════
+function createStars() {
+  const container = document.getElementById("stars");
+  for (let i = 0; i < 90; i++) {
+    const s = document.createElement("div");
+    s.classList.add("star");
+    const size = 1 + Math.random() * 2.5;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      top:${Math.random()*70}%;
+      animation-duration:${2 + Math.random() * 3}s;
+      animation-delay:${Math.random() * 4}s;
+    `;
+    container.appendChild(s);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//   ÁRBOL  (dibujado en canvas con ramas recursivas)
+// ══════════════════════════════════════════════════
+const treeCanvas = document.getElementById("treeCanvas");
+const treeCtx    = treeCanvas.getContext("2d");
+
+let treeAlpha = 0;
+let treeDrawn = false;
+
+function resizeTree() {
+  const W = Math.round(window.innerWidth * 0.42);
+  const H = window.innerHeight;
+  treeCanvas.width  = W;
+  treeCanvas.height = H;
+  treeCanvas.style.width  = W + "px";
+  treeCanvas.style.height = H + "px";
+  if (treeDrawn) drawTree();
+}
+
+function drawTree() {
+  const W = treeCanvas.width;
+  const H = treeCanvas.height;
+  treeCtx.clearRect(0, 0, W, H);
+  const rand = mulberry32(0xA12B3C4D);
+
+  // Colores según progreso
+  const trunkDay   = { r:  90, g:  55, b:  35 };
+  const trunkNight = { r:  35, g:  20, b:  30 };
+  const trunkC     = lerpColor(trunkDay, trunkNight, nightProgress);
+
+  const leafDay    = [
+    { r: 220, g: 120, b: 140 },
+    { r: 240, g: 160, b: 100 },
+    { r: 180, g: 100, b: 130 },
+  ];
+  const leafNight  = [
+    { r:  80, g:  40, b:  70 },
+    { r:  60, g:  30, b:  55 },
+    { r:  50, g:  20, b:  50 },
+  ];
+  const leafColors = leafDay.map((d,i) => lerpColor(d, leafNight[i], nightProgress));
+
+  // Brillo nocturno en hojas
+  const glowAlpha = nightProgress * 0.5;
+
+  treeCtx.save();
+  treeCtx.globalAlpha = treeAlpha;
+
+  // ── Raíces ──
+  const rootX = W * 0.72;
+  const rootY = H;
+  treeCtx.strokeStyle = `rgb(${trunkC.r},${trunkC.g},${trunkC.b})`;
+  treeCtx.lineWidth   = 3;
+  treeCtx.lineCap     = "round";
+  for (let r = 0; r < 5; r++) {
+    const angle = (Math.PI * 0.5) + (r - 2) * 0.22;
+    treeCtx.beginPath();
+    treeCtx.moveTo(rootX, rootY);
+    treeCtx.quadraticCurveTo(
+      rootX + Math.cos(angle) * 50, rootY - 20,
+      rootX + Math.cos(angle) * 90, rootY - 8
+    );
+    treeCtx.globalAlpha = treeAlpha * (0.3 + r * 0.1);
+    treeCtx.stroke();
+  }
+  treeCtx.globalAlpha = treeAlpha;
+
+  // ── Ramas recursivas ──
+  function branch(x, y, angle, length, width, depth) {
+    if (depth === 0 || length < 3) return;
+
+    const nx = x + Math.cos(angle) * length;
+    const ny = y - Math.sin(angle) * length;
+
+    const progress = 1 - depth / 10;
+    const c = lerpColor(trunkC, leafColors[depth % 3], Math.max(0, progress - 0.4) * 2);
+
+    treeCtx.strokeStyle = `rgb(${c.r},${c.g},${c.b})`;
+    treeCtx.lineWidth   = Math.max(0.5, width);
+    treeCtx.lineCap     = "round";
+    treeCtx.beginPath();
+    treeCtx.moveTo(x, y);
+
+    // Ligera curva orgánica
+    const cx = (x + nx) / 2 + (rand() - 0.5) * length * 0.15;
+    const cy = (y + ny) / 2 + (rand() - 0.5) * length * 0.1;
+    treeCtx.quadraticCurveTo(cx, cy, nx, ny);
+    treeCtx.stroke();
+
+    if (depth <= 3) {
+      // Flores / hojas en punta
+      const lc = leafColors[depth % leafColors.length];
+      if (glowAlpha > 0.05) {
+        treeCtx.save();
+        treeCtx.shadowColor = `rgb(${lc.r},${lc.g},${lc.b})`;
+        treeCtx.shadowBlur  = 12;
+      }
+      for (let p = 0; p < 3 + depth; p++) {
+        const pr = 1.5 + depth * 0.8;
+        const pa = angle + (rand() - 0.5) * 1.2;
+        const px = nx + Math.cos(pa) * pr * 2.5;
+        const py = ny - Math.sin(pa) * pr * 2.5;
+        treeCtx.beginPath();
+        treeCtx.arc(px, py, pr, 0, Math.PI * 2);
+        treeCtx.fillStyle = `rgba(${lc.r},${lc.g},${lc.b},${0.55 + glowAlpha})`;
+        treeCtx.fill();
+      }
+      if (glowAlpha > 0.05) treeCtx.restore();
+    }
+
+    // Ramificación: ligeramente sesgada a la izquierda como pediste
+    const spread = 0.28 + depth * 0.03;
+    branch(nx, ny, angle + spread + 0.1, length * 0.68, width * 0.65, depth - 1);
+    branch(nx, ny, angle - spread,       length * 0.72, width * 0.68, depth - 1);
+    if (depth > 5) {
+      branch(nx, ny, angle + spread * 0.4, length * 0.55, width * 0.5, depth - 2);
+    }
+  }
+
+  // Troncaso principal
+  treeCtx.strokeStyle = `rgb(${trunkC.r},${trunkC.g},${trunkC.b})`;
+  treeCtx.lineWidth   = 22;
+  treeCtx.lineCap     = "round";
+  treeCtx.beginPath();
+  treeCtx.moveTo(rootX, rootY);
+  treeCtx.bezierCurveTo(
+    rootX - 5,  rootY - H * 0.18,
+    rootX - 15, rootY - H * 0.38,
+    rootX - 10, rootY - H * 0.52
+  );
+  treeCtx.stroke();
+
+  // Inicio de ramas desde el tronco
+  const trunkTop = { x: rootX - 10, y: H - H * 0.52 };
+
+  // Ramas principales — inclinadas a la izquierda arriba
+  branch(trunkTop.x,     trunkTop.y,      Math.PI/2 + 0.22, H * 0.27, 9, 10);
+  branch(trunkTop.x,     trunkTop.y,      Math.PI/2 - 0.08, H * 0.30, 8, 10);
+  branch(trunkTop.x + 5, trunkTop.y + 40, Math.PI/2 + 0.45, H * 0.22, 7, 9);
+  branch(trunkTop.x - 5, trunkTop.y + 80, Math.PI/2 - 0.35, H * 0.20, 6, 8);
+  branch(trunkTop.x,     trunkTop.y + 55, Math.PI/2 + 0.72, H * 0.18, 5, 8);
+
+  treeCtx.restore();
+  treeDrawn = true;
+}
+
+// ══════════════════════════════════════════════════
+//   CONTADOR ANIMADO
+// ══════════════════════════════════════════════════
+function animateCounter(target) {
+  const el      = document.getElementById("counterNumber");
+  const duration = 2200;
+  const start    = performance.now();
+
+  return new Promise((resolve) => {
+    function tick(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(ease * target);
+      if (t < 1) requestAnimationFrame(tick);
+      else {
+        el.textContent = target;
+        resolve();
+      }
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+// ══════════════════════════════════════════════════
+//   MÁQUINA DE ESCRIBIR CARTA
+// ══════════════════════════════════════════════════
+function startTypewriter() {
+  const el     = document.getElementById("letterBody");
+  const cursor = document.getElementById("letterCursor");
+  let idx      = 0;
+
+  function type() {
+    if (idx >= LETTER_TEXT.length) {
+      cursor.style.display = "none";
+      return;
+    }
+    el.textContent += LETTER_TEXT[idx++];
+    el.parentElement.scrollTop = el.parentElement.scrollHeight;
+    setTimeout(type, TYPING_SPEED + (Math.random() - 0.5) * 20);
+  }
+  setTimeout(type, 1400);
+}
+
+// ══════════════════════════════════════════════════
+//   SECUENCIA PRINCIPAL
+// ══════════════════════════════════════════════════
+let nightAnim = null;
+
+function startNightTransition() {
+  const duration  = 8000;  // 8 s para pasar a noche
+  const startTime = performance.now();
+  const stars     = document.getElementById("stars");
+  const moon      = document.getElementById("moon");
+
+  function tick(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    nightProgress = t;
+
+    // Fondo
+    const c = skyColorAt(t);
+    document.body.style.background = `rgb(${c.r},${c.g},${c.b})`;
+
+    // Árbol se redibuja con nuevos colores
+    drawTree();
+
+    // Estrellas aparecen
+    if (t > 0.45 && !stars.classList.contains("visible")) {
+      stars.classList.add("visible");
+      moon.classList.add("visible");
+    }
+
+    if (t < 1) nightAnim = requestAnimationFrame(tick);
+  }
+
+  nightAnim = requestAnimationFrame(tick);
+}
+
+async function revealUI() {
+  document.getElementById("counterWrap").classList.add("visible");
+  document.getElementById("letterWrap").classList.add("visible");
+  document.getElementById("backBtn").classList.add("visible");
+
+  // Árbol aparece con fade
+  const fadeStart = performance.now();
+  const fadeDur   = 2000;
+  function fadeTree(now) {
+    treeAlpha = Math.min((now - fadeStart) / fadeDur, 1);
+    drawTree();
+    if (treeAlpha < 1) requestAnimationFrame(fadeTree);
+  }
+  requestAnimationFrame(fadeTree);
+
+  // Contador
+  const days = daysSince(START_DATE);
+  await new Promise((r) => setTimeout(r, 600));
+  await animateCounter(days);
+  startNightTransition();
+
+  // Carta
+  startTypewriter();
+}
+
+// ══════════════════════════════════════════════════
+//   INICIALIZACIÓN
+// ══════════════════════════════════════════════════
+window.addEventListener("resize", () => { resizeBg(); resizeTree(); drawTree(); });
+
+resizeBg();
+resizeTree();
+initLeaves();
+createStars();
+animateBg();
+
+// Pequeña pausa de entrada (1 s) → empieza la noche
+setTimeout(() => {
+  revealUI();
+}, 1000);
+
+</script>
 </body>
 </html>
