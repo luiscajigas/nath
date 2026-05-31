@@ -8,29 +8,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-
-/* ── Reset ───────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
 
-/* ── Fuentes ─────────────────────────────────────── */
 :root {
   --font-script:  'Pinyon Script', cursive;
   --font-dancing: 'Dancing Script', cursive;
   --font-serif:   'Cormorant Garamond', serif;
 }
 
-/* ══════════════════════════════════════════════════
-   FONDO — transición día → noche
-══════════════════════════════════════════════════ */
 body {
-  background: #fde8f0;   /* rosa día, se sobrescribe con JS */
+  background: #fde8f0;
   font-family: var(--font-serif);
   position: relative;
-  transition: background 0s;   /* JS maneja la interpolación */
+  transition: background 0s;
 }
 
-/* Canvas de partículas de fondo */
 #bgCanvas {
   position: fixed;
   inset: 0;
@@ -38,9 +31,6 @@ body {
   pointer-events: none;
 }
 
-/* ══════════════════════════════════════════════════
-   ESTRELLAS (solo visibles de noche)
-══════════════════════════════════════════════════ */
 .stars {
   position: fixed;
   inset: 0;
@@ -57,15 +47,11 @@ body {
   background: white;
   animation: twinkle linear infinite;
 }
-
 @keyframes twinkle {
   0%, 100% { opacity: 0.2; transform: scale(1); }
   50%       { opacity: 1;   transform: scale(1.4); }
 }
 
-/* ══════════════════════════════════════════════════
-   LAYOUT PRINCIPAL
-══════════════════════════════════════════════════ */
 .scene {
   position: relative;
   z-index: 3;
@@ -74,11 +60,10 @@ body {
   display: flex;
   align-items: stretch;
   overflow: hidden;
+  animation: sceneIn 0.7s ease both;
 }
+@keyframes sceneIn { from{opacity:0} to{opacity:1} }
 
-/* ══════════════════════════════════════════════════
-   PANEL IZQUIERDO  (cronómetro + carta)
-══════════════════════════════════════════════════ */
 .left-content {
   flex: 1;
   display: flex;
@@ -90,17 +75,13 @@ body {
   position: relative;
 }
 
-/* ── Cronómetro ──────────────────────────────────── */
 .counter-wrap {
   text-align: center;
   opacity: 0;
   transform: translateY(24px);
   transition: opacity 1.4s ease, transform 1.4s ease;
 }
-.counter-wrap.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+.counter-wrap.visible { opacity: 1; transform: translateY(0); }
 
 .counter-label {
   font-family: var(--font-dancing);
@@ -136,7 +117,6 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* ── Carta ───────────────────────────────────────── */
 .letter-wrap {
   width: 100%;
   max-width: 420px;
@@ -144,10 +124,7 @@ body {
   transform: translateY(24px);
   transition: opacity 1.6s ease 0.4s, transform 1.6s ease 0.4s;
 }
-.letter-wrap.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+.letter-wrap.visible { opacity: 1; transform: translateY(0); }
 
 .letter-card {
   background: rgba(255, 255, 255, 0.07);
@@ -156,12 +133,9 @@ body {
   padding: 1.4rem 1.6rem 1.2rem 2rem;
   backdrop-filter: blur(6px);
   position: relative;
-  box-shadow:
-    0 4px 20px rgba(0,0,0,0.18),
-    inset 0 0 0 1px rgba(255,255,255,0.06);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(255,255,255,0.06);
 }
 
-/* Líneas de papel sutiles */
 .letter-card::before {
   content: '';
   position: absolute;
@@ -175,7 +149,6 @@ body {
   pointer-events: none;
 }
 
-/* Margen de carta */
 .letter-card::after {
   content: '';
   position: absolute;
@@ -196,10 +169,11 @@ body {
 }
 
 .letter-body-text {
-  font-family: var(--font-dancing);
-  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  font-family: var(--font-serif);
+  font-size: clamp(1.1rem, 1.6vw, 1.25rem);
   font-weight: 400;
-  line-height: 1.9;
+  line-height: 2.1;
+  letter-spacing: 0.03em;
   color: #f0c8db;
   white-space: pre-wrap;
   word-break: break-word;
@@ -214,8 +188,8 @@ body {
 
 .letter-cursor {
   display: inline-block;
-  font-family: var(--font-dancing);
-  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  font-family: var(--font-serif);
+  font-size: clamp(1.1rem, 1.6vw, 1.25rem);
   color: #ff8fbf;
   animation: blink 1s step-start infinite;
   position: relative;
@@ -235,7 +209,33 @@ body {
   z-index: 1;
 }
 
-/* ── Botón volver ────────────────────────────────── */
+/* ══════ LETRAS DE CANCIÓN (CAP 2) ══════ */
+.lyrics-cap2 {
+  position: absolute;
+  bottom: 12%;
+  right: 30%;
+  width: auto;
+  max-width: 300px;
+  text-align: right;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.lyric-text-cap2 {
+  font-family: var(--font-dancing);
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  color: #ffe0ed;
+  text-shadow: 0 0 15px rgba(255, 180, 210, 0.6), 0 2px 4px rgba(0,0,0,0.3);
+  opacity: 0;
+  transform: translateX(10px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.lyric-text-cap2.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .back-btn {
   opacity: 0;
   transition: opacity 1.5s ease 1s;
@@ -251,9 +251,6 @@ body {
 .back-btn.visible { opacity: 1; }
 .back-btn:hover { color: rgba(255,180,210,0.9); text-decoration: underline; }
 
-/* ══════════════════════════════════════════════════
-   ÁRBOL (panel derecho)
-══════════════════════════════════════════════════ */
 .tree-panel {
   width: 42%;
   position: relative;
@@ -270,9 +267,6 @@ body {
   z-index: 1;
 }
 
-/* ══════════════════════════════════════════════════
-   LUNA
-══════════════════════════════════════════════════ */
 .moon {
   position: fixed;
   top: 6vh;
@@ -289,107 +283,176 @@ body {
   height: clamp(50px, 7vw, 90px);
   border-radius: 50%;
   background: radial-gradient(circle at 38% 38%, #fff8e1, #fde68a 40%, #f6c35e 80%);
-  box-shadow:
-    0 0 20px rgba(253, 230, 138, 0.7),
-    0 0 50px rgba(253, 230, 138, 0.35),
-    0 0 90px rgba(253, 230, 138, 0.15);
+  box-shadow: 0 0 20px rgba(253,230,138,.7), 0 0 50px rgba(253,230,138,.35), 0 0 90px rgba(253,230,138,.15);
   animation: moonGlow 4s ease-in-out infinite;
 }
-
 @keyframes moonGlow {
   0%,100% { box-shadow: 0 0 20px rgba(253,230,138,.7), 0 0 50px rgba(253,230,138,.35), 0 0 90px rgba(253,230,138,.15); }
   50%     { box-shadow: 0 0 30px rgba(253,230,138,.9), 0 0 70px rgba(253,230,138,.5),  0 0 120px rgba(253,230,138,.2); }
 }
-
-/* ══════════════════════════════════════════════════
-   ENTRADA DE PÁGINA
-══════════════════════════════════════════════════ */
-.scene {
-  animation: sceneIn 0.7s ease both;
-}
-@keyframes sceneIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
   </style>
 </head>
 <body>
 
-<!-- Fondo canvas partículas -->
 <canvas id="bgCanvas"></canvas>
-
-<!-- Estrellas -->
 <div class="stars" id="stars"></div>
+<div class="moon" id="moon"><div class="moon-circle"></div></div>
 
-<!-- Luna -->
-<div class="moon" id="moon">
-  <div class="moon-circle"></div>
-</div>
+<!-- Música capítulo 2 — arranca con fade-in desde volumen 0 -->
+<audio id="music2" loop>
+  <source src="public/music/cancion2.mp3" type="audio/mpeg" />
+  <source src="public/music/cancion2.ogg" type="audio/ogg" />
+</audio>
 
-<!-- Escena principal -->
 <div class="scene">
+  <!-- Contenedor para las letras de la canción en bucle -->
+  <div class="lyrics-cap2">
+    <div id="lyricLineCap2" class="lyric-text-cap2"></div>
+  </div>
 
-  <!-- ── IZQUIERDA ── -->
   <div class="left-content">
 
-    <!-- Cronómetro de días -->
     <div class="counter-wrap" id="counterWrap">
       <div class="counter-label" id="counterLabel">llevamos juntos</div>
       <div class="counter-number" id="counterNumber">0</div>
       <div class="counter-sublabel">días desde que me hice tu novio</div>
     </div>
 
-    <!-- Carta -->
     <div class="letter-wrap" id="letterWrap">
       <div class="letter-card">
-        <div class="letter-title-small">Para ti…</div>
+        <div class="letter-title-small">Para Gatito</div>
         <div class="letter-body-text" id="letterBody"></div><span class="letter-cursor" id="letterCursor">|</span>
-        <div class="letter-sign">con todo 🤍</div>
+        <div class="letter-sign">te amo colita</div>
       </div>
     </div>
 
     <button class="back-btn" id="backBtn" onclick="history.back()">← volver al capítulo uno</button>
-
   </div>
 
-  <!-- ── ÁRBOL ── -->
   <div class="tree-panel">
     <canvas id="treeCanvas"></canvas>
   </div>
-
 </div>
 
 <script>
 // ══════════════════════════════════════════════════
-//   CONFIGURACIÓN — edita aquí
+//   CONFIGURACIÓN
 // ══════════════════════════════════════════════════
-const START_DATE  = new Date("2024-04-11T00:00:00");
-const LETTER_TEXT = "espere le dije que mo mire";
-const TYPING_SPEED = 52;   // ms por caracter
+const START_DATE   = new Date("2024-04-11T00:00:00");
+const LETTER_TEXT  = "Cada día de este contador es un recuerdo, una razón para agradecerte y un recordatorio más de lo feliz que soy a tu lado, si pudiera ir al pasado volveria a elegirte una y otra vez y como te dije una vez si tuviera mil vidas en las mil volveria a conocerte porque eres la persona con la que quiero seguir compartiendo mi vida";
+const TYPING_SPEED = 52;
+
+// Secuencia de letras de la canción (Capítulo 2)
+// Puedes establecer el tiempo (ms) que permanece cada línea
+const LYRICS_CAP2 = [
+  { text: "...", time: 3800 },
+  { text: "déjame guiarte", time: 3000 },
+  { text: "a un lugar", time: 2500 },
+  { text: "donde nadie te lastime", time: 3800 },
+  { text: "tú estás segura aquí conmigo", time: 3000 },
+  { text: "conmigo, conmigo", time: 1000 },
+  { text: "...", time: 28000 },
+  { text: "la conoci de casualidad", time: 2500 },
+  { text: "dije: Realme...", time: 800 },
+
+];
+
+// ══════════════════════════════════════════════════
+//   MÚSICA CON FADE-IN Y FADE-OUT
+// ══════════════════════════════════════════════════
+function startMusicFadeIn() {
+  const audio = document.getElementById("music2");
+  if (!audio) return;
+  
+  audio.volume = 0;
+  audio.loop = true;
+
+  const tryPlay = () => {
+    audio.play().then(() => {
+      // Al reproducirse, la función setupMusicFadeOut se encargará
+      // del fade-in inicial y del fade-out al final automáticamente
+      setupMusicFadeOut(audio);
+      
+      // Limpiamos los listeners de interacción una vez que ya suena
+      document.removeEventListener("click", tryPlay);
+      document.removeEventListener("touchstart", tryPlay);
+      document.removeEventListener("keydown", tryPlay);
+    }).catch(() => {
+      console.log("Autoplay bloqueado, esperando interacción...");
+    });
+  };
+
+  // Intentamos reproducir de inmediato
+  tryPlay();
+
+  // Agregamos listeners globales para forzar el inicio al primer toque/clic
+  document.addEventListener("click", tryPlay, { once: true });
+  document.addEventListener("touchstart", tryPlay, { once: true });
+  document.addEventListener("keydown", tryPlay, { once: true });
+}
+
+function setupMusicFadeOut(audio) {
+  const fadeDuration = 4; // segundos para el desvanecimiento
+  const maxVolume = 0.7;
+  
+  audio.ontimeupdate = () => {
+    const timeLeft = audio.duration - audio.currentTime;
+    const timePassed = audio.currentTime;
+    
+    if (timeLeft <= fadeDuration && timeLeft > 0) {
+      // Fade Out: Desvanecer al final
+      audio.volume = Math.max(0, (timeLeft / fadeDuration) * maxVolume);
+    } else if (timePassed <= fadeDuration) {
+      // Fade In: Aparecer gradualmente al inicio (para el bucle)
+      audio.volume = Math.min(maxVolume, (timePassed / fadeDuration) * maxVolume);
+    } else {
+      audio.volume = maxVolume;
+    }
+  };
+}
+
+// ══════════════════════════════════════════════════
+//   LÓGICA DE LETRAS EN BUCLE
+// ══════════════════════════════════════════════════
+async function startLyricsLoop() {
+  const lyricEl = document.getElementById("lyricLineCap2");
+  let index = 0;
+
+  while (true) {
+    const lyric = LYRICS_CAP2[index];
+    
+    // Mostrar letra
+    lyricEl.textContent = lyric.text;
+    lyricEl.classList.add("visible");
+    
+    // Esperar el tiempo establecido
+    await new Promise(resolve => setTimeout(resolve, lyric.time));
+    
+    // Ocultar letra
+    lyricEl.classList.remove("visible");
+    
+    // Esperar a que termine la transición de salida antes de la siguiente
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    index = (index + 1) % LYRICS_CAP2.length;
+  }
+}
 
 // ══════════════════════════════════════════════════
 //   DÍAS TRANSCURRIDOS
 // ══════════════════════════════════════════════════
 function daysSince(date) {
-  const now  = new Date();
-  const diff = now - date;
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+  return Math.floor((Date.now() - date) / (1000 * 60 * 60 * 24));
 }
 
 // ══════════════════════════════════════════════════
 //   INTERPOLACIÓN DE COLOR (día → noche)
 // ══════════════════════════════════════════════════
 const SKY_COLORS = [
-  // t=0  día claro rosado
   { r: 253, g: 232, b: 240 },
-  // t=0.3  atardecer durazno
   { r: 255, g: 180, b: 130 },
-  // t=0.55 crepúsculo morado-rosa
   { r: 120, g:  80, b: 120 },
-  // t=0.75 azul noche profunda
   { r:  22, g:  22, b:  54 },
-  // t=1  noche oscura
   { r:   8, g:   8, b:  28 },
 ];
 
@@ -402,7 +465,6 @@ function lerpColor(a, b, t) {
 }
 
 function skyColorAt(t) {
-  // t: 0..1
   const n   = SKY_COLORS.length - 1;
   const idx = Math.min(Math.floor(t * n), n - 1);
   const frac = (t * n) - idx;
@@ -419,13 +481,12 @@ function mulberry32(seed) {
 }
 
 // ══════════════════════════════════════════════════
-//   CANVAS DE PARTÍCULAS (hojas cayendo)
+//   HOJAS (bgCanvas) — optimizadas: 25 en vez de 55
 // ══════════════════════════════════════════════════
 const bgCanvas = document.getElementById("bgCanvas");
 const bgCtx    = bgCanvas.getContext("2d");
-
 let leaves = [];
-let nightProgress = 0; // 0=día, 1=noche
+let nightProgress = 0;
 
 function resizeBg() {
   bgCanvas.width  = window.innerWidth;
@@ -437,83 +498,76 @@ class Leaf {
   reset(init = false) {
     this.x    = Math.random() * bgCanvas.width;
     this.y    = init ? Math.random() * bgCanvas.height : -20;
-    this.size = 4 + Math.random() * 8;
+    this.size = 4 + Math.random() * 7;
     this.rot  = Math.random() * Math.PI * 2;
-    this.rotSpeed = (Math.random() - 0.5) * 0.04;
-    this.vx   = (Math.random() - 0.5) * 0.8;
-    this.vy   = 0.4 + Math.random() * 0.7;
+    this.rotSpeed = (Math.random() - 0.5) * 0.035;
+    this.vx   = (Math.random() - 0.5) * 0.7;
+    this.vy   = 0.4 + Math.random() * 0.65;
     this.sway = Math.random() * Math.PI * 2;
-    this.swaySpeed = 0.01 + Math.random() * 0.02;
-    // Color según progreso noche
-    const day  = { r: 200, g: 140, b: 160 };
-    const night= { r: 100, g:  60, b:  90 };
-    const c    = lerpColor(day, night, nightProgress);
-    this.color = `rgba(${c.r},${c.g},${c.b},${0.35 + Math.random() * 0.35})`;
+    this.swaySpeed = 0.01 + Math.random() * 0.018;
   }
   update() {
-    this.sway    += this.swaySpeed;
-    this.x       += this.vx + Math.sin(this.sway) * 0.5;
-    this.y       += this.vy;
-    this.rot     += this.rotSpeed;
+    this.sway += this.swaySpeed;
+    this.x    += this.vx + Math.sin(this.sway) * 0.45;
+    this.y    += this.vy;
+    this.rot  += this.rotSpeed;
     if (this.y > bgCanvas.height + 20) this.reset();
   }
   draw(ctx) {
+    const day   = { r: 200, g: 140, b: 160 };
+    const night = { r: 100, g:  60, b:  90 };
+    const c     = lerpColor(day, night, nightProgress);
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rot);
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = `rgba(${c.r},${c.g},${c.b},${0.3 + Math.random() * 0.25})`;
     ctx.beginPath();
-    ctx.ellipse(0, 0, this.size * 0.4, this.size, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, this.size * 0.38, this.size, 0, 0, Math.PI * 2);
     ctx.fill();
-    // nervadura
-    ctx.strokeStyle = `rgba(255,255,255,0.15)`;
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    ctx.moveTo(0, -this.size);
-    ctx.lineTo(0,  this.size);
-    ctx.stroke();
     ctx.restore();
   }
 }
 
 function initLeaves() {
-  leaves = Array.from({ length: 55 }, () => new Leaf());
+  leaves = Array.from({ length: 25 }, () => new Leaf());
 }
 
-function animateBg() {
+let lastBgFrame = 0;
+function animateBg(now) {
+  requestAnimationFrame(animateBg);
+  // Throttle a 30 fps para hojas (no necesitan 60)
+  if (now - lastBgFrame < 33) return;
+  lastBgFrame = now;
   bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
   leaves.forEach(l => { l.update(); l.draw(bgCtx); });
-  requestAnimationFrame(animateBg);
 }
 
 // ══════════════════════════════════════════════════
-//   ESTRELLAS
+//   ESTRELLAS (DOM, 60 en vez de 90)
 // ══════════════════════════════════════════════════
 function createStars() {
   const container = document.getElementById("stars");
-  for (let i = 0; i < 90; i++) {
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 60; i++) {
     const s = document.createElement("div");
     s.classList.add("star");
-    const size = 1 + Math.random() * 2.5;
-    s.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      top:${Math.random()*70}%;
-      animation-duration:${2 + Math.random() * 3}s;
-      animation-delay:${Math.random() * 4}s;
-    `;
-    container.appendChild(s);
+    const size = 1 + Math.random() * 2;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*70}%;animation-duration:${2+Math.random()*3}s;animation-delay:${Math.random()*4}s;`;
+    frag.appendChild(s);
   }
+  container.appendChild(frag);
 }
 
 // ══════════════════════════════════════════════════
-//   ÁRBOL  (dibujado en canvas con ramas recursivas)
+//   ÁRBOL — ramas precalculadas con RNG determinista
+//   Solo se recalcula en resize; colores se interpolan
+//   en draw sin Math.random()
 // ══════════════════════════════════════════════════
 const treeCanvas = document.getElementById("treeCanvas");
 const treeCtx    = treeCanvas.getContext("2d");
-
 let treeAlpha = 0;
-let treeDrawn = false;
+let treeSegments = []; // geometría precalculada
+let treeFlowers  = [];
 
 function resizeTree() {
   const W = Math.round(window.innerWidth * 0.42);
@@ -522,134 +576,115 @@ function resizeTree() {
   treeCanvas.height = H;
   treeCanvas.style.width  = W + "px";
   treeCanvas.style.height = H + "px";
-  if (treeDrawn) drawTree();
+  buildTreeGeometry(W, H);
+}
+
+function buildTreeGeometry(W, H) {
+  treeSegments = [];
+  treeFlowers  = [];
+  const rand = mulberry32(0xA12B3C4D);
+
+  const rootX  = W * 0.72;
+  const trunkTopX = rootX - 10;
+  const trunkTopY = H - H * 0.52;
+
+  function branch(x, y, angle, length, width, depth) {
+    if (depth === 0 || length < 3) return;
+    const nx = x + Math.cos(angle) * length;
+    const ny = y - Math.sin(angle) * length;
+    const cx = (x + nx) / 2 + (rand() - 0.5) * length * 0.15;
+    const cy = (y + ny) / 2 + (rand() - 0.5) * length * 0.10;
+    treeSegments.push({ x1:x, y1:y, cx, cy, x2:nx, y2:ny, w: Math.max(0.5, width), depth });
+    if (depth <= 3) {
+      for (let p = 0; p < 3 + depth; p++) {
+        const pr = 1.5 + depth * 0.8;
+        const pa = angle + (rand() - 0.5) * 1.2;
+        treeFlowers.push({
+          x: nx + Math.cos(pa) * pr * 2.5,
+          y: ny - Math.sin(pa) * pr * 2.5,
+          r: pr,
+          ci: depth % 3,
+        });
+      }
+    }
+    const spread = 0.28 + depth * 0.03;
+    branch(nx, ny, angle + spread + 0.1, length * 0.68, width * 0.65, depth - 1);
+    branch(nx, ny, angle - spread,       length * 0.72, width * 0.68, depth - 1);
+    if (depth > 5) branch(nx, ny, angle + spread * 0.4, length * 0.55, width * 0.5, depth - 2);
+  }
+
+  branch(trunkTopX,     trunkTopY,      Math.PI/2 + 0.22, H * 0.27, 9, 10);
+  branch(trunkTopX,     trunkTopY,      Math.PI/2 - 0.08, H * 0.30, 8, 10);
+  branch(trunkTopX + 5, trunkTopY + 40, Math.PI/2 + 0.45, H * 0.22, 7,  9);
+  branch(trunkTopX - 5, trunkTopY + 80, Math.PI/2 - 0.35, H * 0.20, 6,  8);
+  branch(trunkTopX,     trunkTopY + 55, Math.PI/2 + 0.72, H * 0.18, 5,  8);
 }
 
 function drawTree() {
   const W = treeCanvas.width;
   const H = treeCanvas.height;
   treeCtx.clearRect(0, 0, W, H);
-  const rand = mulberry32(0xA12B3C4D);
 
-  // Colores según progreso
-  const trunkDay   = { r:  90, g:  55, b:  35 };
-  const trunkNight = { r:  35, g:  20, b:  30 };
+  const trunkDay   = { r: 90, g: 55, b: 35 };
+  const trunkNight = { r: 35, g: 20, b: 30 };
   const trunkC     = lerpColor(trunkDay, trunkNight, nightProgress);
 
-  const leafDay    = [
-    { r: 220, g: 120, b: 140 },
-    { r: 240, g: 160, b: 100 },
-    { r: 180, g: 100, b: 130 },
-  ];
-  const leafNight  = [
-    { r:  80, g:  40, b:  70 },
-    { r:  60, g:  30, b:  55 },
-    { r:  50, g:  20, b:  50 },
-  ];
+  const leafDay   = [{ r:220,g:120,b:140 },{ r:240,g:160,b:100 },{ r:180,g:100,b:130 }];
+  const leafNight = [{ r: 80,g: 40,b: 70 },{ r: 60,g: 30,b: 55 },{ r: 50,g: 20,b: 50 }];
   const leafColors = leafDay.map((d,i) => lerpColor(d, leafNight[i], nightProgress));
-
-  // Brillo nocturno en hojas
-  const glowAlpha = nightProgress * 0.5;
+  const glowAlpha  = nightProgress * 0.5;
 
   treeCtx.save();
   treeCtx.globalAlpha = treeAlpha;
+  treeCtx.lineCap = "round";
 
-  // ── Raíces ──
   const rootX = W * 0.72;
-  const rootY = H;
+  // Raíces
   treeCtx.strokeStyle = `rgb(${trunkC.r},${trunkC.g},${trunkC.b})`;
-  treeCtx.lineWidth   = 3;
-  treeCtx.lineCap     = "round";
+  treeCtx.lineWidth = 3;
   for (let r = 0; r < 5; r++) {
     const angle = (Math.PI * 0.5) + (r - 2) * 0.22;
     treeCtx.beginPath();
-    treeCtx.moveTo(rootX, rootY);
+    treeCtx.moveTo(rootX, H);
     treeCtx.quadraticCurveTo(
-      rootX + Math.cos(angle) * 50, rootY - 20,
-      rootX + Math.cos(angle) * 90, rootY - 8
+      rootX + Math.cos(angle) * 50, H - 20,
+      rootX + Math.cos(angle) * 90, H - 8
     );
     treeCtx.globalAlpha = treeAlpha * (0.3 + r * 0.1);
     treeCtx.stroke();
   }
   treeCtx.globalAlpha = treeAlpha;
 
-  // ── Ramas recursivas ──
-  function branch(x, y, angle, length, width, depth) {
-    if (depth === 0 || length < 3) return;
-
-    const nx = x + Math.cos(angle) * length;
-    const ny = y - Math.sin(angle) * length;
-
-    const progress = 1 - depth / 10;
-    const c = lerpColor(trunkC, leafColors[depth % 3], Math.max(0, progress - 0.4) * 2);
-
-    treeCtx.strokeStyle = `rgb(${c.r},${c.g},${c.b})`;
-    treeCtx.lineWidth   = Math.max(0.5, width);
-    treeCtx.lineCap     = "round";
-    treeCtx.beginPath();
-    treeCtx.moveTo(x, y);
-
-    // Ligera curva orgánica
-    const cx = (x + nx) / 2 + (rand() - 0.5) * length * 0.15;
-    const cy = (y + ny) / 2 + (rand() - 0.5) * length * 0.1;
-    treeCtx.quadraticCurveTo(cx, cy, nx, ny);
-    treeCtx.stroke();
-
-    if (depth <= 3) {
-      // Flores / hojas en punta
-      const lc = leafColors[depth % leafColors.length];
-      if (glowAlpha > 0.05) {
-        treeCtx.save();
-        treeCtx.shadowColor = `rgb(${lc.r},${lc.g},${lc.b})`;
-        treeCtx.shadowBlur  = 12;
-      }
-      for (let p = 0; p < 3 + depth; p++) {
-        const pr = 1.5 + depth * 0.8;
-        const pa = angle + (rand() - 0.5) * 1.2;
-        const px = nx + Math.cos(pa) * pr * 2.5;
-        const py = ny - Math.sin(pa) * pr * 2.5;
-        treeCtx.beginPath();
-        treeCtx.arc(px, py, pr, 0, Math.PI * 2);
-        treeCtx.fillStyle = `rgba(${lc.r},${lc.g},${lc.b},${0.55 + glowAlpha})`;
-        treeCtx.fill();
-      }
-      if (glowAlpha > 0.05) treeCtx.restore();
-    }
-
-    // Ramificación: ligeramente sesgada a la izquierda como pediste
-    const spread = 0.28 + depth * 0.03;
-    branch(nx, ny, angle + spread + 0.1, length * 0.68, width * 0.65, depth - 1);
-    branch(nx, ny, angle - spread,       length * 0.72, width * 0.68, depth - 1);
-    if (depth > 5) {
-      branch(nx, ny, angle + spread * 0.4, length * 0.55, width * 0.5, depth - 2);
-    }
-  }
-
-  // Troncaso principal
+  // Tronco
   treeCtx.strokeStyle = `rgb(${trunkC.r},${trunkC.g},${trunkC.b})`;
-  treeCtx.lineWidth   = 22;
-  treeCtx.lineCap     = "round";
+  treeCtx.lineWidth = 22;
   treeCtx.beginPath();
-  treeCtx.moveTo(rootX, rootY);
-  treeCtx.bezierCurveTo(
-    rootX - 5,  rootY - H * 0.18,
-    rootX - 15, rootY - H * 0.38,
-    rootX - 10, rootY - H * 0.52
-  );
+  treeCtx.moveTo(rootX, H);
+  treeCtx.bezierCurveTo(rootX - 5, H - H*0.18, rootX - 15, H - H*0.38, rootX - 10, H - H*0.52);
   treeCtx.stroke();
 
-  // Inicio de ramas desde el tronco
-  const trunkTop = { x: rootX - 10, y: H - H * 0.52 };
+  // Ramas (geometría precalculada, solo colores cambian)
+  for (const s of treeSegments) {
+    const progress = 1 - s.depth / 10;
+    const c = lerpColor(trunkC, leafColors[s.depth % 3], Math.max(0, progress - 0.4) * 2);
+    treeCtx.strokeStyle = `rgb(${c.r},${c.g},${c.b})`;
+    treeCtx.lineWidth = s.w;
+    treeCtx.beginPath();
+    treeCtx.moveTo(s.x1, s.y1);
+    treeCtx.quadraticCurveTo(s.cx, s.cy, s.x2, s.y2);
+    treeCtx.stroke();
+  }
 
-  // Ramas principales — inclinadas a la izquierda arriba
-  branch(trunkTop.x,     trunkTop.y,      Math.PI/2 + 0.22, H * 0.27, 9, 10);
-  branch(trunkTop.x,     trunkTop.y,      Math.PI/2 - 0.08, H * 0.30, 8, 10);
-  branch(trunkTop.x + 5, trunkTop.y + 40, Math.PI/2 + 0.45, H * 0.22, 7, 9);
-  branch(trunkTop.x - 5, trunkTop.y + 80, Math.PI/2 - 0.35, H * 0.20, 6, 8);
-  branch(trunkTop.x,     trunkTop.y + 55, Math.PI/2 + 0.72, H * 0.18, 5, 8);
+  // Flores (sin shadowBlur)
+  for (const f of treeFlowers) {
+    const lc = leafColors[f.ci];
+    treeCtx.fillStyle = `rgba(${lc.r},${lc.g},${lc.b},${0.55 + glowAlpha})`;
+    treeCtx.beginPath();
+    treeCtx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+    treeCtx.fill();
+  }
 
   treeCtx.restore();
-  treeDrawn = true;
 }
 
 // ══════════════════════════════════════════════════
@@ -666,28 +701,21 @@ function animateCounter(target) {
       const ease = 1 - Math.pow(1 - t, 3);
       el.textContent = Math.round(ease * target);
       if (t < 1) requestAnimationFrame(tick);
-      else {
-        el.textContent = target;
-        resolve();
-      }
+      else { el.textContent = target; resolve(); }
     }
     requestAnimationFrame(tick);
   });
 }
 
 // ══════════════════════════════════════════════════
-//   MÁQUINA DE ESCRIBIR CARTA
+//   MÁQUINA DE ESCRIBIR
 // ══════════════════════════════════════════════════
 function startTypewriter() {
   const el     = document.getElementById("letterBody");
   const cursor = document.getElementById("letterCursor");
-  let idx      = 0;
-
+  let idx = 0;
   function type() {
-    if (idx >= LETTER_TEXT.length) {
-      cursor.style.display = "none";
-      return;
-    }
+    if (idx >= LETTER_TEXT.length) { cursor.style.display = "none"; return; }
     el.textContent += LETTER_TEXT[idx++];
     el.parentElement.scrollTop = el.parentElement.scrollHeight;
     setTimeout(type, TYPING_SPEED + (Math.random() - 0.5) * 20);
@@ -696,12 +724,10 @@ function startTypewriter() {
 }
 
 // ══════════════════════════════════════════════════
-//   SECUENCIA PRINCIPAL
+//   TRANSICIÓN NOCHE
 // ══════════════════════════════════════════════════
-let nightAnim = null;
-
 function startNightTransition() {
-  const duration  = 8000;  // 8 s para pasar a noche
+  const duration  = 8000;
   const startTime = performance.now();
   const stars     = document.getElementById("stars");
   const moon      = document.getElementById("moon");
@@ -710,31 +736,30 @@ function startNightTransition() {
     const t = Math.min((now - startTime) / duration, 1);
     nightProgress = t;
 
-    // Fondo
     const c = skyColorAt(t);
     document.body.style.background = `rgb(${c.r},${c.g},${c.b})`;
 
-    // Árbol se redibuja con nuevos colores
     drawTree();
 
-    // Estrellas aparecen
     if (t > 0.45 && !stars.classList.contains("visible")) {
       stars.classList.add("visible");
       moon.classList.add("visible");
     }
 
-    if (t < 1) nightAnim = requestAnimationFrame(tick);
+    if (t < 1) requestAnimationFrame(tick);
   }
-
-  nightAnim = requestAnimationFrame(tick);
+  requestAnimationFrame(tick);
 }
 
+// ══════════════════════════════════════════════════
+//   SECUENCIA PRINCIPAL
+// ══════════════════════════════════════════════════
 async function revealUI() {
   document.getElementById("counterWrap").classList.add("visible");
   document.getElementById("letterWrap").classList.add("visible");
   document.getElementById("backBtn").classList.add("visible");
 
-  // Árbol aparece con fade
+  // Árbol fade-in
   const fadeStart = performance.now();
   const fadeDur   = 2000;
   function fadeTree(now) {
@@ -744,32 +769,34 @@ async function revealUI() {
   }
   requestAnimationFrame(fadeTree);
 
-  // Contador
-  const days = daysSince(START_DATE);
-  await new Promise((r) => setTimeout(r, 600));
-  await animateCounter(days);
+  // Contador → noche
+  await new Promise(r => setTimeout(r, 600));
+  await animateCounter(daysSince(START_DATE));
   startNightTransition();
 
-  // Carta
   startTypewriter();
 }
 
 // ══════════════════════════════════════════════════
-//   INICIALIZACIÓN
+//   INIT
 // ══════════════════════════════════════════════════
-window.addEventListener("resize", () => { resizeBg(); resizeTree(); drawTree(); });
+window.addEventListener("resize", () => {
+  resizeBg();
+  resizeTree();
+  drawTree();
+});
 
 resizeBg();
 resizeTree();
 initLeaves();
 createStars();
-animateBg();
+requestAnimationFrame(animateBg);
 
-// Pequeña pausa de entrada (1 s) → empieza la noche
 setTimeout(() => {
   revealUI();
-}, 1000);
-
+  startMusicFadeIn();
+  startLyricsLoop();
+}, 100);
 </script>
 </body>
 </html>
