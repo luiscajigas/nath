@@ -1,171 +1,32 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Para ti ✿</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="src/styles/main.css" />
-  </head>
-  <body>
-    <!-- ═══════════════════ PANTALLA DE PLAY ═══════════════════ -->
-    <div
-      class="play-screen"
-      id="playScreen"
-      role="button"
-      tabindex="0"
-      aria-label="Iniciar experiencia"
-    >
-      <div class="play-petals" aria-hidden="true">
-        <span></span><span></span><span></span><span></span> <span></span
-        ><span></span><span></span><span></span>
-      </div>
-      <div class="play-content">
-        <div class="play-image-wrap">
-          <img src="public/images/play.png" alt="Comenzar" class="play-img" />
-          <div class="play-btn-overlay" aria-hidden="true">
-            <svg
-              viewBox="0 0 64 64"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                cx="32"
-                cy="32"
-                r="30"
-                fill="rgba(255,255,255,0.18)"
-                stroke="rgba(255,255,255,0.6)"
-                stroke-width="1.5"
-              />
-              <path d="M26 20l20 12-20 12V20z" fill="white" opacity="0.9" />
-            </svg>
-          </div>
-        </div>
-        <p class="play-hint">toca para comenzar</p>
-      </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>...</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #555;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            padding: 20px;
+        }
+        .message {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <div class="message">
+        que sentido tratarte bonito cuando no te lo mereces en verdad
     </div>
-
-    <!-- Pétalos decorativos de fondo -->
-    <div class="petals-bg" aria-hidden="true">
-      <span class="petal"></span><span class="petal"></span
-      ><span class="petal"></span> <span class="petal"></span
-      ><span class="petal"></span><span class="petal"></span>
-      <span class="petal"></span><span class="petal"></span>
-    </div>
-
-    <div class="layout">
-      <!-- ═══════════════════ LADO IZQUIERDO: FOTOS + LETRA ═══════════════════ -->
-      <section class="left-panel" id="leftPanel">
-        <!-- Stack final de fotos (oculto hasta que termina la canción) -->
-        <div class="photos-stack" id="photosStack" aria-hidden="true"></div>
-
-        <!-- Foto activa -->
-        <div class="photo-stage" id="photoStage">
-          <div class="photo-frame" id="photoFrame">
-            <img id="activePhoto" src="" alt="Recuerdo" />
-            <div class="photo-shine"></div>
-          </div>
-        </div>
-
-        <!-- Letra de la canción -->
-        <div class="lyrics-area" id="lyricsArea">
-          <div class="music-note" aria-hidden="true">♪</div>
-          <p class="lyric-line" id="lyricLine"></p>
-          <div class="music-note right" aria-hidden="true">♫</div>
-        </div>
-      </section>
-
-      <!-- Separador ornamental -->
-      <div class="divider" aria-hidden="true">
-        <div class="divider-line"></div>
-        <div class="divider-ornament">✿</div>
-        <div class="divider-line"></div>
-      </div>
-
-      <!-- ═══════════════════ LADO DERECHO: CARTA ═══════════════════ -->
-      <aside class="right-panel">
-        <div class="letter-container">
-          <div class="letter-header">
-            <div class="letter-deco" aria-hidden="true">~ ✦ ~</div>
-            <h1 class="letter-title">Para ti,<br /><em>mi todo</em></h1>
-            <div class="letter-deco" aria-hidden="true">~ ✦ ~</div>
-          </div>
-
-          <div class="letter-body">
-            <p class="letter-text" id="letterText"></p>
-            <span class="cursor" id="typingCursor" aria-hidden="true">|</span>
-          </div>
-
-          <div class="letter-signature">
-            <span>Con todo mi amor</span>
-          </div>
-        </div>
-
-        <!-- Card "Capítulo dos" -->
-        <div
-          class="chapter-card"
-          id="chapterCard"
-          role="button"
-          tabindex="0"
-          aria-label="Pasar al capítulo dos"
-          onclick="goToChapterTwo()"
-          onkeydown="if (event.key === 'Enter') goToChapterTwo();"
-        >
-          <div class="chapter-icon" aria-hidden="true">
-            <svg
-              viewBox="0 0 48 48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M24 4C12.95 4 4 12.95 4 24s8.95 20 20 20 20-8.95 20-20S35.05 4 24 4z"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              />
-              <path
-                d="M16 24l8-8 8 8"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M24 32V16"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-              <path
-                d="M8 38 Q24 44 40 38"
-                stroke="currentColor"
-                stroke-width="1"
-                stroke-linecap="round"
-                fill="none"
-                opacity="0.5"
-              />
-            </svg>
-          </div>
-          <div class="chapter-text">
-            <span class="chapter-label">Siguiente</span>
-            <span class="chapter-title">Pasar al capítulo dos</span>
-          </div>
-          <div class="chapter-arrow" aria-hidden="true">→</div>
-        </div>
-      </aside>
-    </div>
-
-    <audio id="bgMusic" loop>
-      <source src="public/music/cancion1.mp3" type="audio/mpeg" />
-      <source src="public/music/cancion1.ogg" type="audio/ogg" />
-    </audio>
-
-    <script src="src/components/data.js"></script>
-    <script src="src/components/app.js"></script>
-  </body>
+</body>
 </html>
