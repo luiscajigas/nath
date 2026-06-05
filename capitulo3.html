@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Capítulo III ✿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pink-50:  #fff0f5;
+      --pink-200: #ffbdd6;
+      --pink-400: #f76597;
+      --pink-600: #c42860;
+      --text-dark: #4a2035;
+      --font-script: 'Pinyon Script', cursive;
+      --font-dancing: 'Dancing Script', cursive;
+      --font-serif: 'Cormorant Garamond', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #fde8f0;
+      font-family: var(--font-serif);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 2rem;
+    }
+
+    /* ══════ LOGIN SCREEN ══════ */
+    .login-container {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(196, 40, 96, 0.15);
+      max-width: 500px;
+      width: 100%;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      z-index: 10;
+    }
+
+    .login-title {
+      font-family: var(--font-script);
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--pink-600);
+    }
+
+    .question-box {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .question-text {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-dark);
+      display: block;
+    }
+
+    .answer-input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid var(--pink-200);
+      border-radius: 10px;
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .answer-input:focus {
+      border-color: var(--pink-400);
+    }
+
+    .login-btn {
+      background: var(--pink-400);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      font-family: var(--font-dancing);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .login-btn:hover {
+      background: var(--pink-600);
+      transform: translateY(-2px);
+    }
+
+    .error-msg {
+      color: #d32f2f;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    /* ══════ TIMELINE CONTENT (HIDDEN BY DEFAULT) ══════ */
+    #timelineContent {
+      display: none;
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 2rem;
+    }
+
+    .timeline-title {
+      font-family: var(--font-script);
+      font-size: 3.5rem;
+      text-align: center;
+      margin-bottom: 3rem;
+      color: var(--pink-600);
+    }
+
+    .timeline {
+      position: relative;
+      padding: 2rem 0;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background: var(--pink-200);
+      transform: translateX(-50%);
+    }
+
+    .timeline-item {
+      margin-bottom: 4rem;
+      position: relative;
+      width: 50%;
+      padding: 0 2rem;
+    }
+
+    .timeline-item:nth-child(odd) {
+      left: 0;
+      text-align: right;
+    }
+
+    .timeline-item:nth-child(even) {
+      left: 50%;
+      text-align: left;
+    }
+
+    .timeline-dot {
+      width: 20px;
+      height: 20px;
+      background: var(--pink-400);
+      border-radius: 50%;
+      position: absolute;
+      top: 0;
+      left: 100%;
+      transform: translateX(-50%);
+      z-index: 1;
+      border: 4px solid #fde8f0;
+    }
+
+    .timeline-item:nth-child(even) .timeline-dot {
+      left: 0;
+    }
+
+    .timeline-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+    }
+
+    .timeline-card:hover {
+      transform: scale(1.03);
+    }
+
+    .timeline-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .timeline-date {
+      font-family: var(--font-dancing);
+      color: var(--pink-400);
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-text {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .timeline::before { left: 30px; }
+      .timeline-item { width: 100%; padding-left: 70px; text-align: left !important; }
+      .timeline-item:nth-child(even) { left: 0; }
+      .timeline-dot { left: 30px !important; }
+    }
+
+    /* ══════ BOTÓN VOLVER ══════ */
+    .back-btn-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin-top: 3rem;
+      padding-bottom: 4rem;
+    }
+
+    .back-btn-cap3 {
+      font-family: var(--font-dancing);
+      font-size: 1rem;
+      color: var(--pink-600);
+      background: none;
+      border: 1px solid var(--pink-200);
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-btn-cap3:hover {
+      background: var(--pink-50);
+      border-color: var(--pink-400);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container" id="loginScreen">
+    <h1 class="login-title">Para entrar...</h1>
+    <p style="margin-bottom: 2rem; opacity: 0.8;">Responde estas preguntas sobre nosotros</p>
+    
+    <div id="questionsForm">
+      <!-- Preguntas se generarán aquí -->
+    </div>
+
+    <button class="login-btn" onclick="checkAnswers()">Revelar mi regalo</button>
+    <p class="error-msg" id="errorMsg">Alguna respuesta no es correcta, ¡inténtalo de nuevo mi vida!</p>
+  </div>
+
+  <div id="timelineContent">
+    <h1 class="timeline-title">Nuestra Historia</h1>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <img src="public/images/1.png" class="timeline-img" alt="Primera cita">
+          <span class="timeline-date">Fecha de nuestra primera cita</span>
+          <p class="timeline-text">Ese día mi mundo cambió por completo...</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <img src="public/images/2.png" class="timeline-img" alt="Primer viaje">
+          <span class="timeline-date">Nuestro primer viaje</span>
+          <p class="timeline-text">Aventuras que nunca olvidaré a tu lado.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <img src="public/images/3.png" class="timeline-img" alt="Primer te amo">
+          <span class="timeline-date">El primer "Te amo"</span>
+          <p class="timeline-text">Dos palabras que significan el universo entero.</p>
+        </div>
+      </div>
+      <!-- Puedes agregar más hitos aquí -->
+    </div>
+
+    <div class="back-btn-container">
+      <a href="capitulo2.html" class="back-btn-cap3">
+        <span>← Volver al capítulo 2</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════════════
+    //   CONFIGURACIÓN DE PREGUNTAS (8 Preguntas)
+    //   Edita las preguntas y respuestas aquí
+    // ══════════════════════════════════════════════════
+    const CHALLENGE = [
+      { q: "¿Cuál es mi color favorito?", a: "azul" },
+      { q: "¿En qué mes empezamos a hablar?", a: "Octubre" },
+      { q: "¿Cual es mi comida favorita?", a: "hamburguesa" },
+      { q: "¿Cual es mi fecha de vencimiento?", a: "28 de abril de 2005" },
+      { q: "¿Que animal somos?", a: "gatitos" },
+      { q: "¿Qué día nos hicimos novios?", a: "11 de abril" },
+      { q: "¿Cuál es mi jugo favorito?", a: "guanabana en leche" },
+      { q: "¿Como se llama la playlist que te hice?", a: "N" }
+    ];
+
+    function initQuestions() {
+      const container = document.getElementById('questionsForm');
+      CHALLENGE.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'question-box';
+        div.innerHTML = `
+          <label class="question-text">${index + 1}. ${item.q}</label>
+          <input type="text" class="answer-input" data-index="${index}" placeholder="Tu respuesta...">
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkAnswers() {
+      const inputs = document.querySelectorAll('.answer-input');
+      let allCorrect = true;
+
+      inputs.forEach(input => {
+        const index = input.getAttribute('data-index');
+        const userAnswer = input.value.trim().toLowerCase();
+        const correctAnswer = CHALLENGE[index].a.toLowerCase();
+
+        if (userAnswer !== correctAnswer) {
+          allCorrect = false;
+        }
+      });
+
+      if (allCorrect) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('timelineContent').style.display = 'block';
+        window.scrollTo(0, 0);
+      } else {
+        const error = document.getElementById('errorMsg');
+        error.style.display = 'block';
+        setTimeout(() => error.style.display = 'none', 3000);
+      }
+    }
+
+    initQuestions();
+  </script>
+</body>
+</html>

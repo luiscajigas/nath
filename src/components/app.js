@@ -152,35 +152,32 @@
   async function runSequence() {
     photoOrder = shufflePhotos(TOTAL_PHOTOS);
 
-    while (true) {
-      for (let i = 0; i < SEQUENCE.length; i++) {
-        if (sequenceFinished) break;
+    for (let i = 0; i < SEQUENCE.length; i++) {
+      if (sequenceFinished) break;
 
-        const step     = SEQUENCE[i];
-        const photoNum = photoOrder[currentPhotoIndex % photoOrder.length];
-        const photoDur = step.photo ?? step.lyric;
-        const lyricDur = step.lyric;
+      const step     = SEQUENCE[i];
+      const photoNum = photoOrder[i % photoOrder.length];
+      const photoDur = step.photo ?? step.lyric;
+      const lyricDur = step.lyric;
 
-        // Foto y letra arrancan al mismo tiempo
-        await Promise.all([
-          showPhoto(photoSrc(photoNum)),
-          showLyric(step.text),
-        ]);
+      // Foto y letra arrancan al mismo tiempo
+      await Promise.all([
+        showPhoto(photoSrc(photoNum)),
+        showLyric(step.text),
+      ]);
 
-        const maxDur = Math.max(photoDur, lyricDur);
-        await wait(maxDur);
+      // Las duraciones pueden ser distintas; esperamos la mayor
+      // pero programamos el cambio de cada uno en su propio tiempo
+      const maxDur = Math.max(photoDur, lyricDur);
 
-        currentPhotoIndex = (currentPhotoIndex + 1) % photoOrder.length;
-      }
-      
-      // Si queremos que el bucle sea infinito, no llamamos a finishSequence
-      // o lo llamamos solo bajo cierta condición. 
-      // Dado que el usuario pidió bucle, comentaré finishSequence por ahora
-      // o lo dejaré para cuando el usuario decida salir.
-      // Pero el diseño original parece que termina y muestra un stack de fotos.
-      // Si es bucle, el stack de fotos nunca se mostraría.
-      // Asumiré que el bucle de letras es lo primordial.
+      // Si la foto dura menos que la letra, ya cambiará en el next loop.
+      // Usamos el max para asegurar que ambos terminen antes de avanzar.
+      await wait(maxDur);
+
+      currentPhotoIndex = (i + 1) % photoOrder.length;
     }
+
+    await finishSequence();
   }
 
   // ── Fin de la secuencia ───────────────────────────
